@@ -11,11 +11,14 @@ class TypeGenerator extends syntax_1.Visitor {
         const vars = new TypeGenerator();
         vars.visit(syntax_1.parse(ftl, { withSpans: true }));
         const union = vars.nodes
-            .map((node) => `${node.comment ? `  /* ${node.comment} */\n` : ''}  | ['${node.name}', Record<${Array.from(node.ids)
+            .map((node) => `${node.comment ? `  /* ${node.comment} */\n` : ''}  | ['${node.name}', Vars<${Array.from(node.ids)
             .map((id) => `'${id}'`)
-            .join(' | ')}, string | number>]`)
+            .join(' | ')}>]`)
             .join('\n');
-        return `export type LocalizedMessage =\n${union}`;
+        return [
+            `export type LocalizedMessage =\n${union}`,
+            'type Vars<T> = Record<T, string | number>',
+        ].join('\n\n');
     }
     visitMessage(node) {
         this.nodes.push({ name: node.id.name, ids: new Set() });

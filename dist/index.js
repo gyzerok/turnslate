@@ -5,7 +5,7 @@ const bundle_1 = require("@fluent/bundle");
 const langneg_1 = require("@fluent/langneg");
 const sequence_1 = require("@fluent/sequence");
 const cached_iterable_1 = require("cached-iterable");
-class ReactLocalization {
+class TurnslateLocalization {
     constructor(bundles) {
         this.bundles = cached_iterable_1.CachedSyncIterable.from(bundles);
     }
@@ -31,7 +31,7 @@ class ReactLocalization {
         console.warn('[@turnslate/cli] ' + error.name + ': ' + error.message);
     }
 }
-const generateLocalization = (localizationConfig) => new ReactLocalization(generateBundles(navigator.languages.slice(), localizationConfig));
+const generateLocalization = (userLocales, localizationConfig) => new TurnslateLocalization(generateBundles(userLocales, localizationConfig));
 exports.generateLocalization = generateLocalization;
 function* generateBundles(userLocales, localizationConfig) {
     const locales = Object.keys(localizationConfig);
