@@ -3,7 +3,7 @@ import { negotiateLanguages } from '@fluent/langneg'
 import { mapBundleSync } from '@fluent/sequence'
 import { CachedSyncIterable } from 'cached-iterable'
 
-class ReactLocalization {
+class TurnslateLocalization {
   public bundles: Iterable<FluentBundle>
 
   constructor(bundles: Iterable<FluentBundle>) {
@@ -41,11 +41,9 @@ class ReactLocalization {
 }
 
 export const generateLocalization = (
+  userLocales: string[],
   localizationConfig: Record<string, string>,
-) =>
-  new ReactLocalization(
-    generateBundles(navigator.languages.slice(), localizationConfig),
-  )
+) => new TurnslateLocalization(generateBundles(userLocales, localizationConfig))
 
 function* generateBundles(
   userLocales: string[],
