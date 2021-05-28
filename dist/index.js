@@ -12,24 +12,6 @@ class TurnslateLocalization {
     getBundle(id) {
         return sequence_1.mapBundleSync(this.bundles, id);
     }
-    getString(id, args, fallback) {
-        const bundle = this.getBundle(id);
-        if (bundle) {
-            const msg = bundle.getMessage(id);
-            if (msg && msg.value) {
-                let errors = [];
-                let value = bundle.formatPattern(msg.value, args, errors);
-                for (let error of errors) {
-                    this.reportError(error);
-                }
-                return value;
-            }
-        }
-        return fallback || id;
-    }
-    reportError(error) {
-        console.warn('[@turnslate/cli] ' + error.name + ': ' + error.message);
-    }
 }
 const generateLocalization = (userLocales, localizationConfig) => new TurnslateLocalization(generateBundles(userLocales, localizationConfig));
 exports.generateLocalization = generateLocalization;

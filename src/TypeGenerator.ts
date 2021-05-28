@@ -26,7 +26,7 @@ export class TypeGenerator extends Visitor {
 
     return [
       `export type LocalizedMessage =\n${union}`,
-      'type Vars<T> = Record<T, string | number>',
+      'type Vars<T extends string> = Record<T, string | number>',
     ].join('\n\n')
   }
 

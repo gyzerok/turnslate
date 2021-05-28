@@ -1,4 +1,4 @@
-import { FluentBundle, FluentResource, FluentVariable } from '@fluent/bundle'
+import { FluentBundle, FluentResource } from '@fluent/bundle'
 import { negotiateLanguages } from '@fluent/langneg'
 import { mapBundleSync } from '@fluent/sequence'
 import { CachedSyncIterable } from 'cached-iterable'
@@ -12,31 +12,6 @@ class TurnslateLocalization {
 
   getBundle(id: string): FluentBundle | null {
     return mapBundleSync(this.bundles, id)
-  }
-
-  getString(
-    id: string,
-    args?: Record<string, FluentVariable> | null,
-    fallback?: string,
-  ): string {
-    const bundle = this.getBundle(id)
-    if (bundle) {
-      const msg = bundle.getMessage(id)
-      if (msg && msg.value) {
-        let errors: Array<Error> = []
-        let value = bundle.formatPattern(msg.value, args, errors)
-        for (let error of errors) {
-          this.reportError(error)
-        }
-        return value
-      }
-    }
-
-    return fallback || id
-  }
-
-  reportError(error: Error): void {
-    console.warn('[@turnslate/cli] ' + error.name + ': ' + error.message)
   }
 }
 
