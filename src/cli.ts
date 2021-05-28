@@ -11,8 +11,7 @@ const args = arg({
   '--out-file': String,
 })
 
-const URL =
-  'https://us-central1-turnslate.cloudfunctions.net/getEntriesForProject'
+const URL = 'https://us-central1-turnslate.cloudfunctions.net/langs'
 
 async function run() {
   if (!args['--project-id']) {
@@ -42,45 +41,12 @@ async function run() {
 
   const json = await response.json()
 
-  const tab = '  '
+  const { ftl } = json.langs[json.main]
 
-  const ftls = Object.keys(json.langs).map((langAlias) => {
-    const ftl: string[] = []
-
-    for (const entry of json.entries) {
-      const translationForLang = entry.translations[langAlias]
-      if (!translationForLang) {
-        console.log(
-          `Entry ${entry.id} – Can't find translation for ${json.langs[langAlias]}, id would be used`,
-        )
-      }
-      const translation = translationForLang || entry.id
-      ftl.push(
-        [
-          `${entry.id} =`,
-          `${tab}${translation.split('\n').join('\n' + tab)}`,
-        ].join('\n'),
-      )
-    }
-
-    return {
-      lang: langAlias,
-      ftl: ftl.join('\n\n'),
-    }
-  })
-
-  const defaultFtl = ftls[0]
-  const localizationConfigOutput = [
-    `export const localizationConfig = {`,
-    `\t${ftls.map(({ lang, ftl }) => `${lang}:\n\`${ftl}\``).join(',\n\t')}`,
-    `} as const`,
-  ].join('\n')
-
-  if (!defaultFtl) {
-    throw new Error('Not found default language translation')
-  }
-  const generatedTypes = TypeGenerator.fromFTL(defaultFtl.ftl)
-  const output = generatedTypes + '\n\n' + localizationConfigOutput
+  const output = [
+    TypeGenerator.fromFTL(ftl),
+    `export const langs = ${JSON.stringify(json.langs, null, 2)} as const`,
+  ].join('\n\n')
 
   fs.writeFileSync(args['--out-file'], output)
   console.log(
