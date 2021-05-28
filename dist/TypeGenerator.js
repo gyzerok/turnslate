@@ -7,9 +7,9 @@ class TypeGenerator extends syntax_1.Visitor {
         super(...arguments);
         this.nodes = [];
     }
-    static generate(node) {
+    static fromFTL(ftl) {
         const vars = new TypeGenerator();
-        vars.visit(node);
+        vars.visit(syntax_1.parse(ftl, { withSpans: true }));
         const union = vars.nodes
             .map((node) => `${node.comment ? `  /* ${node.comment} */\n` : ''}  | ['${node.name}', Record<${Array.from(node.ids)
             .map((id) => `'${id}'`)
@@ -34,20 +34,3 @@ class TypeGenerator extends syntax_1.Visitor {
     }
 }
 exports.TypeGenerator = TypeGenerator;
-const test = `
-# Gonvo
-shared-photos =
-    {$userName} {$photoCount ->
-        [one] added a new photo
-       *[other] added {$photoCount} new photos
-    } to {$userGender ->
-        [male] his stream
-        [female] her stream
-       *[other] their stream
-    }.
-
-shared-photos-again =
-    {$userName} is pidor.
-`;
-const ast = syntax_1.parse(test, { withSpans: true });
-console.log(TypeGenerator.generate(ast));

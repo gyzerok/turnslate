@@ -1,11 +1,9 @@
 #!/usr/bin/env node
 
 import * as fs from 'fs'
-import { Message, parse } from '@fluent/syntax'
 import fetch from 'isomorphic-unfetch'
 import arg from 'arg'
-
-import { parseElements } from './parser'
+import { TypeGenerator } from './TypeGenerator'
 
 const args = arg({
   '--project-id': String,
@@ -81,50 +79,13 @@ async function run() {
   if (!defaultFtl) {
     throw new Error('Not found default language translation')
   }
-  const generatedTypes = generateTypesFromFtl(defaultFtl.ftl)
+  const generatedTypes = TypeGenerator.fromFTL(defaultFtl.ftl)
   const output = generatedTypes + '\n\n' + localizationConfigOutput
 
   fs.writeFileSync(args['--out-file'], output)
   console.log(
     `Generated translations for ${Object.keys(json.langs).length} languages`,
   )
-}
-
-function generateTypesFromFtl(string: string) {
-  const astResult = parse(string, { withSpans: false })
-  let generatedTypes = ''
-
-  for (const messageOrJunk of astResult.body) {
-    if (messageOrJunk.type !== 'Message') break
-
-    const messageEntry = messageOrJunk as Message
-    const id = messageEntry.id.name
-    const comment = messageEntry.comment?.content
-
-    const identifiers = messageEntry.value
-      ? Array.from(new Set(parseElements(messageEntry.value.elements)))
-      : []
-
-    if (!id) break
-    if (comment) generatedTypes = generatedTypes + `\n # ${comment}`
-    if (identifiers.length) {
-      generatedTypes =
-        generatedTypes +
-        '\n' +
-        `| [
-      '${id}',
-      {
-        ${identifiers.map((identifier) => `${identifier}: string | number \n`)}
-      },
-    ]`
-    } else {
-      generatedTypes = generatedTypes + `\n | ['${id}']`
-    }
-  }
-
-  if (generatedTypes.length === 0) generatedTypes = 'any'
-
-  return 'export type LocalizedMessage = ' + generatedTypes
 }
 
 run().catch((err) => console.log(err))
