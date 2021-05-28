@@ -18,13 +18,16 @@ export class TypeGenerator extends Visitor {
         (node) =>
           `${node.comment ? `  /* ${node.comment} */\n` : ''}  | ['${
             node.name
-          }', Record<${Array.from(node.ids)
+          }', Vars<${Array.from(node.ids)
             .map((id) => `'${id}'`)
-            .join(' | ')}, string | number>]`,
+            .join(' | ')}>]`,
       )
       .join('\n')
 
-    return `export type LocalizedMessage =\n${union}`
+    return [
+      `export type LocalizedMessage =\n${union}`,
+      'type Vars<T> = Record<T, string | number>',
+    ].join('\n\n')
   }
 
   visitMessage(node: Message): void {
