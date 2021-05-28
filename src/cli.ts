@@ -41,11 +41,14 @@ async function run() {
 
   const json = await response.json()
 
-  const { ftl } = json.langs[json.main]
+  const ftl = json.langs[json.main]
+  const langs = Object.entries(json.langs).map(
+    ([locale, ftl]) => `'${locale}': \`${ftl}\``,
+  )
 
   const output = [
     TypeGenerator.fromFTL(ftl),
-    `export const langs = ${JSON.stringify(json.langs, null, 2)} as const`,
+    `export const langs = {\n  ${langs.join(',\n  ')}\n} as const`,
   ].join('\n\n')
 
   fs.writeFileSync(args['--out-file'], output)
