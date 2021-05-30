@@ -50,7 +50,7 @@ async function run() {
     `
 import { FluentBundle, FluentResource } from '@fluent/bundle'
 
-interface Lang {
+export interface Lang {
   <K extends keyof LocalizedMessage>(
     id: K,
     ...params: LocalizedMessage[K]
