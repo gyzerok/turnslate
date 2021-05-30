@@ -61,6 +61,8 @@ async function run() {
     const langs = Object.entries(json.langs).map(([locale, ftl]) => `'${locale}': \`${ftl}\``);
     const output = [
         `
+import { FluentBundle, FluentResource } from '@fluent/bundle'
+
 interface Lang {
   <K extends keyof LocalizedMessage>(
     id: K,
@@ -75,6 +77,11 @@ export function createLang(locale: keyof typeof langs): Lang {
 
   return (id, params) => {
     const message = bundle.getMessage(id)
+
+    if (!message || !message.value) {
+      return id
+    }
+
     return bundle.formatPattern(message.value, params)
   }
 }
