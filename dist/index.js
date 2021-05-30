@@ -5,6 +5,16 @@ const bundle_1 = require("@fluent/bundle");
 const langneg_1 = require("@fluent/langneg");
 const sequence_1 = require("@fluent/sequence");
 const cached_iterable_1 = require("cached-iterable");
+// class Lang {
+//   private bundle: FluentBundle
+//   constructor(locale: string, ftl: string) {
+//     this.bundle = new FluentBundle(locale)
+//     const resource = new FluentResource('ftl')
+//     this.bundle.addResource(resource)
+//   }
+//   use(id)
+//   switchLocale(locale: string): void {}
+// }
 class TurnslateLocalization {
     constructor(bundles) {
         this.bundles = cached_iterable_1.CachedSyncIterable.from(bundles);

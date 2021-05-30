@@ -47,6 +47,25 @@ async function run() {
   )
 
   const output = [
+    `
+interface Lang {
+  <K extends keyof LocalizedMessage>(
+    id: K,
+    ...params: LocalizedMessage[K]
+  ): string
+}
+
+export function createLang(locale: keyof typeof langs): Lang {
+  const bundle = new FluentBundle(locale)
+  const resource = new FluentResource(langs[locale])
+  bundle.addResource(resource)
+
+  return (id, params) => {
+    const message = bundle.getMessage(id)
+    return bundle.formatPattern(message.value, params)
+  }
+}
+    `.trim(),
     TypeGenerator.fromFTL(ftl),
     `export const langs = {\n  ${langs.join(',\n  ')}\n} as const`,
   ].join('\n\n')

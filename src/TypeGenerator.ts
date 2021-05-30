@@ -14,18 +14,24 @@ export class TypeGenerator extends Visitor {
     vars.visit(parse(ftl, { withSpans: true }))
 
     const union = vars.nodes
-      .map(
-        (node) =>
-          `${node.comment ? `  /* ${node.comment} */\n` : ''}  | ['${
-            node.name
-          }', Vars<${Array.from(node.ids)
-            .map((id) => `'${id}'`)
-            .join(' | ')}>]`,
-      )
+      .map((node) => {
+        const key = `${node.comment ? `  /* ${node.comment} */\n` : ''}  '${
+          node.name
+        }'`
+        const ids = Array.from(node.ids)
+        const vars =
+          ids.length === 0
+            ? `[]`
+            : `[Vars<${Array.from(node.ids)
+                .map((id) => `'${id}'`)
+                .join(' | ')}>]`
+
+        return `${key}: ${vars};`
+      })
       .join('\n')
 
     return [
-      `export type LocalizedMessage =\n${union}`,
+      `export type LocalizedMessage = {\n${union}\n}`,
       'type Vars<T extends string> = Record<T, string | number>',
     ].join('\n\n')
   }
