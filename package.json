@@ -4,7 +4,7 @@
   "bin": "dist/cli.js",
   "license": "MIT",
   "scripts": {
-    "build": "tsc"
+    "build": "rm -rf dist && tsc"
   },
   "dependencies": {
     "@fluent/bundle": "^0.16.1",
@@ -16,5 +16,8 @@
     "@types/node": "^15.6.1",
     "prettier": "^2.3.0",
     "typescript": "^4.3.2"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }
