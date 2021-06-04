@@ -16,9 +16,7 @@ class TypeGenerator extends syntax_1.Visitor {
             const ids = Array.from(node.ids);
             const vars = ids.length === 0
                 ? `[]`
-                : `[Vars<${Array.from(node.ids)
-                    .map((id) => `'${id}'`)
-                    .join(' | ')}>]`;
+                : `[Vars<${ids.map((id) => `'${id}'`).join(' | ')}>]`;
             return `${key}: ${vars};`;
         })
             .join('\n');
@@ -44,3 +42,8 @@ class TypeGenerator extends syntax_1.Visitor {
     }
 }
 exports.TypeGenerator = TypeGenerator;
+const ftl = `
+# Simple things are simple.
+hello-user = Hello, {$userName}!
+`;
+console.log(TypeGenerator.fromFTL(ftl));

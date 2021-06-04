@@ -75,7 +75,7 @@ export function createLang(locale: keyof typeof langs): Lang {
   const resource = new FluentResource(langs[locale])
   bundle.addResource(resource)
 
-  return (id, params) => {
+  return (id, ...[params]) => {
     const message = bundle.getMessage(id)
 
     if (!message || !message.value) {
