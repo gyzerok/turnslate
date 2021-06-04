@@ -22,9 +22,7 @@ export class TypeGenerator extends Visitor {
         const vars =
           ids.length === 0
             ? `[]`
-            : `[Vars<${Array.from(node.ids)
-                .map((id) => `'${id}'`)
-                .join(' | ')}>]`
+            : `[Vars<${ids.map((id) => `'${id}'`).join(' | ')}>]`
 
         return `${key}: ${vars};`
       })
