@@ -14,14 +14,27 @@ const args = arg({
 const URL = 'https://us-central1-turnslate.cloudfunctions.net/langs'
 
 async function run() {
-  if (!args['--project-id']) {
-    throw new Error('missing required argument: --project-id')
+  const projectId = process.env.PROJECT_ID || args['--project-id']
+  const outFile = process.env.OUT_FILE || args['--out-file']
+  const token = process.env.TOKEN || args['--token']
+
+  if (!projectId) {
+    console.error(
+      'Missing project id. It can be passed via argument --project-id or env variable PROJECT_ID',
+    )
+    process.exit(1)
   }
-  if (!args['--out-file']) {
-    throw new Error('missing required argument: --out-file')
+  if (!outFile) {
+    console.error(
+      'Missing out file. It can be passed via argument --out-file or env variable OUT_FILE',
+    )
+    process.exit(1)
   }
-  if (!args['--token']) {
-    throw new Error('missing required argument: --token')
+  if (!token) {
+    console.error(
+      'Missing api token. It can be passed via argument --token or env variable TOKEN',
+    )
+    process.exit(1)
   }
 
   const response = await fetch(URL, {
@@ -29,10 +42,7 @@ async function run() {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      projectId: args['--project-id'],
-      token: args['--token'],
-    }),
+    body: JSON.stringify({ projectId, token }),
   })
 
   if (!response.ok) {
@@ -77,7 +87,7 @@ export function createLang(locale: keyof typeof langs): Lang {
     `export const langs = {\n  ${langs.join(',\n  ')}\n} as const`,
   ].join('\n\n')
 
-  fs.writeFileSync(args['--out-file'], output)
+  fs.writeFileSync(outFile, output)
   console.log(
     `Generated translations for ${Object.keys(json.langs).length} languages`,
   )
