@@ -9,16 +9,36 @@ import {
 export class TypeGenerator extends Visitor {
   nodes: Array<{ name: string; comment?: string; ids: Set<string> }> = []
 
-  static fromFTL(ftl: string): string {
-    const vars = new TypeGenerator()
-    vars.visit(parse(ftl, { withSpans: true }))
+  static fromLangs(langs: Record<string, string>, mainLocale: string): string {
+    const mainFtl = langs[mainLocale]
+    if (!mainFtl)
+      throw new Error(`Translation is not found for locale ${mainLocale}`)
 
-    const union = vars.nodes
+    const restLocalesVisitors = Object.keys(langs)
+      .filter((locale) => locale !== mainLocale)
+      .map((locale) => {
+        const visitor = new TypeGenerator()
+        visitor.visit(parse(langs[locale]!, { withSpans: true }))
+        return visitor
+      })
+
+    const mainLocaleVisitor = new TypeGenerator()
+    mainLocaleVisitor.visit(parse(mainFtl, { withSpans: true }))
+
+    const union = mainLocaleVisitor.nodes
       .map((node) => {
         const key = `${node.comment ? `  /* ${node.comment} */\n` : ''}  '${
           node.name
         }'`
-        const ids = Array.from(node.ids)
+        const idsFromOtherLocales = restLocalesVisitors.reduce(
+          (set, { nodes }) => {
+            const relativeNode = nodes.find((n) => n.name === node.name)
+            if (!relativeNode) return set
+            return new Set([...set, ...relativeNode.ids])
+          },
+          new Set<string>(),
+        )
+        const ids = Array.from(new Set([...node.ids, ...idsFromOtherLocales]))
         const vars =
           ids.length === 0
             ? `[]`

@@ -51,7 +51,6 @@ async function run() {
 
   const json = await response.json()
 
-  const ftl = json.langs[json.main]
   const langs = Object.entries(json.langs).map(
     ([locale, ftl]) => `'${locale}': \`${ftl}\``,
   )
@@ -83,7 +82,7 @@ export function createLang(locale: keyof typeof langs): Lang {
   }
 }
     `.trim(),
-    TypeGenerator.fromFTL(ftl),
+    TypeGenerator.fromLangs(json.langs, json.main),
     `export const langs = {\n  ${langs.join(',\n  ')}\n} as const`,
   ].join('\n\n')
 
